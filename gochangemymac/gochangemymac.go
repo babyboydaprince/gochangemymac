@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/google/gopacket/pcap"
 )
 
 func getOriginalMAC(interfaceName string) (string, error) {
@@ -73,7 +72,7 @@ func changeMAC(interfaceName, newMAC string) error {
 }
 
 func printHelp() {
-	fmt.Println("Usage:")
+	fmt.Println("\n\nUsage:")
 	fmt.Printf("  %s -interface <interface_name> -mac <new_mac_address>\n", os.Args[0])
 	fmt.Println("Options:")
 	flag.PrintDefaults()
@@ -124,7 +123,7 @@ func main() {
 
 		fmt.Printf("Randomized MAC address set for %s\n", *interfaceName)
 	} else if *newMAC != "" {
-		if _, err := pcap.ParseMAC(*newMAC); err != nil {
+		if _, err := net.ParseMAC(*newMAC); err != nil {
 			log.Fatalf("Invalid MAC address: %v", err)
 		}
 
