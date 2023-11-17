@@ -20,7 +20,8 @@ func getOriginalMAC(interfaceName string) (string, error) {
 	var cmd *exec.Cmd
 
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("wmic", "nic", "where", fmt.Sprintf("NetConnectionID='%s'", interfaceName), "get", "MACAddress", "/format:list")
+		cmd = exec.Command("wmic", "nic", "where",
+			fmt.Sprintf("NetConnectionID='%s'", interfaceName), "get", "MACAddress", "/format:list")
 
 	} else if runtime.GOOS == "linux" {
 		cmd = exec.Command("cat", fmt.Sprintf("/sys/class/net/%s/address", interfaceName))
@@ -68,9 +69,13 @@ func generateRandomMAC() (string, error) {
 func changeMAC(interfaceName, newMAC string) error {
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
-		cmd = exec.Command("wmic", "nic", "where", fmt.Sprintf("NetConnectionID='%s'", interfaceName), "call", "configure", "setting", fmt.Sprintf("MACAddress='%s'", newMAC))
+		cmd = exec.Command("wmic", "nic", "where",
+			fmt.Sprintf("NetConnectionID='%s'", interfaceName),
+			"call", "configure", "setting", fmt.Sprintf("MACAddress='%s'", newMAC))
+
 	} else if runtime.GOOS == "linux" {
 		cmd = exec.Command("ip", "link", "set", interfaceName, "address", newMAC)
+
 	} else {
 		return fmt.Errorf("unsupported operating system: %s", runtime.GOOS)
 	}
@@ -104,8 +109,8 @@ func findInterfaces() {
 
 func banner() {
 
-	asciiLogo1 := figure.NewColorFigure("Go ", "slant", "cyan", true)
-	asciiLogo2 := figure.NewColorFigure("change my mac!", "slant", "green", true)
+	asciiLogo1 := figure.NewColorFigure("Go change", "slant", "cyan", true)
+	asciiLogo2 := figure.NewColorFigure("my mac!", "slant", "yellow", true)
 
 	asciiLogo1.Print()
 	asciiLogo2.Print()
@@ -126,7 +131,7 @@ func main() {
 		return
 	}
 
-	findIfaces := flag.Bool("findIfaces", false, "List available network interfaces to work with\n")
+	findInterface := flag.Bool("findInterface", false, "List available network interfaces to work with\n")
 	interfaceName := flag.String("interface", "", "Name of the network interface\n")
 	newMAC := flag.String("mac", "", "New MAC address\n")
 	setRandom := flag.Bool("random", false, "Set a randomized MAC address\n")
@@ -142,49 +147,49 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *findIfaces {
+	if *findInterface {
 		findInterfaces()
 	}
 
 	if *interfaceName == "" {
-		log.Fatal("Interface name is required")
+		log.Fatal("\nInterface name is required")
 	}
 
 	if *setRandom && *restore {
-		log.Fatal("Both -random and -restore options cannot be used together")
+		log.Fatal("\nBoth -random and -restore options cannot be used together")
 	}
 
 	if *restore {
 		originalMAC, err := getOriginalMAC(*interfaceName)
 		if err != nil {
-			log.Fatalf("Error retrieving original MAC address: %v", err)
+			log.Fatalf("\nError retrieving original MAC address: %v", err)
 		}
 
 		err = restoreOriginalMAC(*interfaceName, originalMAC)
 		if err != nil {
-			log.Fatalf("Error restoring original MAC address: %v", err)
+			log.Fatalf("\nError restoring original MAC address: %v", err)
 		}
 
-		fmt.Printf("Original MAC address for %s restored: %s\n", *interfaceName, originalMAC)
+		fmt.Printf("\nOriginal MAC address for %s restored: %s\n", *interfaceName, originalMAC)
 	} else if *setRandom {
 		err := setRandomMAC(*interfaceName)
 		if err != nil {
-			log.Fatalf("Error setting randomized MAC address: %v", err)
+			log.Fatalf("\nError setting randomized MAC address: %v", err)
 		}
 
-		fmt.Printf("Randomized MAC address set for %s\n", *interfaceName)
+		fmt.Printf("\nRandomized MAC address set for %s\n, changed to %s", *interfaceName, *newMAC)
 	} else if *newMAC != "" {
 		if _, err := net.ParseMAC(*newMAC); err != nil {
-			log.Fatalf("Invalid MAC address: %v", err)
+			log.Fatalf("\nInvalid MAC address: %v", err)
 		}
 
 		err := changeMAC(*interfaceName, *newMAC)
 		if err != nil {
-			log.Fatalf("Error changing MAC address: %v", err)
+			log.Fatalf("\nError changing MAC address: %v", err)
 		}
 
-		fmt.Printf("MAC address for %s changed to %s\n", *interfaceName, *newMAC)
+		fmt.Printf("\nMAC address for %s changed to %s\n", *interfaceName, *newMAC)
 	} else {
-		log.Fatal("Either -mac, -random, or -restore option is required")
+		log.Fatal("\nEither -mac, -random, or -restore option is required")
 	}
 }
