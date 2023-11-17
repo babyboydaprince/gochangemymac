@@ -11,14 +11,20 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/common-nighthawk/go-figure"
 )
 
 func getOriginalMAC(interfaceName string) (string, error) {
+
 	var cmd *exec.Cmd
+
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("wmic", "nic", "where", fmt.Sprintf("NetConnectionID='%s'", interfaceName), "get", "MACAddress", "/format:list")
+
 	} else if runtime.GOOS == "linux" {
 		cmd = exec.Command("cat", fmt.Sprintf("/sys/class/net/%s/address", interfaceName))
+
 	} else {
 		return "", fmt.Errorf("unsupported operating system: %s", runtime.GOOS)
 	}
@@ -45,13 +51,17 @@ func setRandomMAC(interfaceName string) error {
 }
 
 func generateRandomMAC() (string, error) {
-	rand.Seed(time.Now().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
 
 	firstByte := 0x02
 	otherBytes := make([]byte, 5)
-	rand.Read(otherBytes)
+	r.Read(otherBytes)
 
-	randomMAC := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", firstByte, otherBytes[0], otherBytes[1], otherBytes[2], otherBytes[3], otherBytes[4])
+	randomMAC := fmt.Sprintf(
+		"%02x:%02x:%02x:%02x:%02x:%02x", firstByte,
+		otherBytes[0], otherBytes[1], otherBytes[2], otherBytes[3], otherBytes[4])
+
 	return randomMAC, nil
 }
 
@@ -71,28 +81,69 @@ func changeMAC(interfaceName, newMAC string) error {
 	return cmd.Run()
 }
 
+func findInterfaces() {
+	banner()
+
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return
+	} else {
+
+		fmt.Print("\nList of network devices: \n")
+		for _, iface := range interfaces {
+			fmt.Printf("Name: %s\n", iface.Name)
+			fmt.Printf("Index: %d\n", iface.Index)
+			fmt.Printf("MTU: %d\n", iface.MTU)
+			fmt.Printf("Hardware address (MAC): %s\n", iface.HardwareAddr)
+			fmt.Println("--------------")
+		}
+		return
+	}
+}
+
+func banner() {
+
+	asciiLogo1 := figure.NewColorFigure("Go ", "slant", "cyan", true)
+	asciiLogo2 := figure.NewColorFigure("change my mac!", "slant", "green", true)
+
+	asciiLogo1.Print()
+	asciiLogo2.Print()
+}
+
 func printHelp() {
-	fmt.Println("\n\nUsage:")
-	fmt.Printf("  %s -interface <interface_name> -mac <new_mac_address>\n", os.Args[0])
-	fmt.Println("Options:")
+	fmt.Print("\nUsage:  ")
+	fmt.Printf("  gochangemymac -interface <interface_name> -mac <new_mac_address>\n\n")
+	fmt.Print("Options:\n\n")
 	flag.PrintDefaults()
-	fmt.Println("\nAdditional Options:")
-	fmt.Println("  -random  Set a randomized MAC address")
-	fmt.Println("  -restore Restore the original MAC address")
 }
 
 func main() {
-	interfaceName := flag.String("interface", "", "Name of the network interface")
-	newMAC := flag.String("mac", "", "New MAC address")
-	setRandom := flag.Bool("random", false, "Set a randomized MAC address")
-	restore := flag.Bool("restore", false, "Restore the original MAC address")
-	showHelp := flag.Bool("help", false, "Show help menu")
+
+	if len(os.Args) < 2 {
+		banner()
+		fmt.Print("\nUse: gochangemymac -help for usage manual.\n\n")
+		return
+	}
+
+	findIfaces := flag.Bool("findIfaces", false, "List available network interfaces to work with\n")
+	interfaceName := flag.String("interface", "", "Name of the network interface\n")
+	newMAC := flag.String("mac", "", "New MAC address\n")
+	setRandom := flag.Bool("random", false, "Set a randomized MAC address\n")
+	restore := flag.Bool("restore", false, "Restore the original MAC address\n")
+	showHelp := flag.Bool("help", false, "Show help menu\n")
 
 	flag.Parse()
 
 	if *showHelp {
+
+		banner()
 		printHelp()
 		os.Exit(0)
+	}
+
+	if *findIfaces {
+		findInterfaces()
 	}
 
 	if *interfaceName == "" {
