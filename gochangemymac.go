@@ -185,7 +185,7 @@ func findInterfaces() {
 			fmt.Print("\033[H\033[2J")
 			banner() // Clear the console
 			fmt.Println(t.Render())
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 		return
 
@@ -284,7 +284,7 @@ func main() {
 			fmt.Print("\033[H\033[2J")
 			banner() // Clear the console
 			fmt.Println(t.Render())
-			time.Sleep(150 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 
 		// Prompt the user to choose an interface
