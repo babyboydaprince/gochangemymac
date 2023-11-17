@@ -167,7 +167,7 @@ func findInterfaces() {
 	t.SetTitle("Network interfaces")
 
 	t.AppendHeader(table.Row{
-		"#", "Name", "Index"})
+		"#", "Name", "Index", "MTU", "MAC Address"})
 
 	if runtime.GOOS == "linux" {
 		interfaces, err := net.Interfaces()

@@ -44,7 +44,7 @@ python NukeTown.py -h
 
 ## 📌Go change my mac version
 
-- 1.0
+- 1.9
 
 ---
 
