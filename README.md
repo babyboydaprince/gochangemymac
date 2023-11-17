@@ -61,7 +61,7 @@ Respect other people's privacy.
 
 ## 📌 Comming soon
 
-- FindInterface param to bring correct Windows network interface names;
+- Windows interface enabler and disabler complete functionality;
 
 ---
 
