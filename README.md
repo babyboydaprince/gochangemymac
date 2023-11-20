@@ -34,9 +34,6 @@ For Windows systems, you may run the compiled executable:
 Running the executables or the Go script it will install the dependencies automatically.
 ```
 
-```
-python NukeTown.py -h
-```
 
 ## 🛠️ Made with
 
