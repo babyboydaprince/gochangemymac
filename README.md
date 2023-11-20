@@ -26,7 +26,7 @@ For Windows systems, you may run the compiled executable:
 
 ### 📋 Prerequisites
 
-- Golang 1.20+
+- Golang 1.21+
 
 ### 🔧 Installation
 
