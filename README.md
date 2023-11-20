@@ -1,6 +1,6 @@
 # GO CHANGE MY MAC - MAC Address changer tool made with Golang
 
-Go change my mac is a MAC Acddress changer tool, made with Golang and also compatible with Windows, Linux, Mac and Android devices.
+Go change my mac is a MAC Address changer tool, made with Golang and also compatible with Windows, Linux, Mac and Android devices.
 
 ![alt text](https://github.com/babyboydaprince/gochangemymac/blob/main/img/logo.png?raw=true)
 
