@@ -6,7 +6,7 @@ Go change my mac is a MAC Address changer tool, made with Golang and also compat
 
 ## 🚀 Run
 
- You can run the Go script in all operational systems on /bin directory with:
+ You can run the Go script in all operational systems with:
 
  ```
 go run gochangemymac.go -help
